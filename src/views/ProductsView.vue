@@ -33,14 +33,12 @@
               <button
                 type="button"
                 class="btn btn-outline-primary btn-sm"
-                @click="openModal('edit', item)"
               >
                 編輯
               </button>
               <button
                 type="button"
                 class="btn btn-outline-danger btn-sm"
-                @click="openModal('delete', item)"
               >
                 刪除
               </button>
@@ -49,29 +47,19 @@
         </tr>
       </tbody>
     </table>
-    <!-- 頁數元件 前內後外  -->
+    <!-- 頁數元件 前內(get-productlist)後外(getProductsList)  -->
     <Pagination
       :pages="pagination"
       @get-productlist="getProductsList"
     ></Pagination>
   </div>
-  <!-- 新增/編輯Modal -->
-  <div
-    id="productModal"
-    ref="productModal"
-    class="modal fade"
-    tabindex="-1"
-    aria-labelledby="productModalLabel"
-    aria-hidden="true"
-  >
     <!-- 新增&編輯產品元件 -->
-    <ProductModal
+    <product-modal
       :temp="temp"
       :is-new="isNew"
       @update="getProductsList"
       :current-page="pagination.current_page"
-    ></ProductModal>
-  </div>
+    ></product-modal>
   <!--刪除Modal -->
   <div
     id="delProductModal"
@@ -89,6 +77,8 @@
 import DeleteModal from '@/components/DelModal.vue'
 import Pagination from '@/components/Pagination.vue'
 import ProductModal from '@/components/ProductModal.vue'
+const productModal = {}
+const delProductModal = {}
 export default {
   components: {
     Pagination,
@@ -117,14 +107,14 @@ export default {
     // 開啟modal
     openModal (type, product) {
       if (type === 'new') {
-        // 如果判斷是新增產品 temp內的資料會被清空
+      // 如果判斷是新增產品 temp內的資料會被清空
         this.temp = {
           imagesUrl: []
         }
         // modal標題顯示新增產品
         this.isNew = true
         // 打開modal
-        ProductModal.show()
+        productModal.show()
       } else if (type === 'edit') {
         // 如果判斷是編輯產品
         this.temp = JSON.parse(JSON.stringify(product)) // 改成深拷貝避免多圖新增、修改、刪除會傳參考修改到 product.imagesUrl
@@ -134,10 +124,11 @@ export default {
         }
         // modal標題顯示編輯產品
         this.isNew = false
-        ProductModal.show()
+        productModal.show()
       } else if (type === 'delete') {
-        this.temp = { ...product } // 顯示modal
-        DeleteModal.show()
+        this.temp = { ...product }
+        // 顯示modal
+        delProductModal.show()
       }
     }
   },

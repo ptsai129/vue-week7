@@ -14,7 +14,7 @@
           <router-link to="/admin/order" class="nav-link">訂單</router-link>
         </li>
         <li class="nav-item">
-         <a href="#" @click.prevent="LogOut">登出</a>
+           <a class="nav-link" href="#" @click.prevent="LogOut">登出</a>
         </li>
       </ul>
     </div>
