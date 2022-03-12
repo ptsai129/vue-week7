@@ -3,7 +3,7 @@
   <div class="container">
     <div class="text-end mt-4">
       <!-- 用帶入的字串參數判斷開啟modal類別 -->
-      <button class="btn btn-primary" type="button" @click="openModal('new')">
+      <button class="btn btn-primary" type="button" >
         建立新的產品
       </button>
     </div>
@@ -30,16 +30,10 @@
           </td>
           <td>
             <div class="btn-group">
-              <button
-                type="button"
-                class="btn btn-outline-primary btn-sm"
-              >
+              <button type="button" class="btn btn-outline-primary btn-sm" @click="openProductModal(item.id)" >
                 編輯
               </button>
-              <button
-                type="button"
-                class="btn btn-outline-danger btn-sm"
-              >
+              <button type="button" class="btn btn-outline-danger btn-sm">
                 刪除
               </button>
             </div>
@@ -53,32 +47,23 @@
       @get-productlist="getProductsList"
     ></Pagination>
   </div>
-    <!-- 新增&編輯產品元件 -->
-    <product-modal
-      :temp="temp"
-      :is-new="isNew"
-      @update="getProductsList"
-      :current-page="pagination.current_page"
-    ></product-modal>
+  <!-- 新增&編輯產品元件 -->
+  <product-modal
+    :id="productId"
+    ref="productModal"
+    :current-page="pagination.current_page"
+  ></product-modal>
   <!--刪除Modal -->
-  <div
-    id="delProductModal"
+  <DeleteModal
+    :item="temp"
     ref="delProductModal"
-    class="modal fade"
-    tabindex="-1"
-    aria-labelledby="delProductModalLabel"
-    aria-hidden="true"
-  >
-    <DeleteModal :item="temp" @update="getProductsList"></DeleteModal>
-  </div>
+  ></DeleteModal>
 </template>
 
 <script>
 import DeleteModal from '@/components/DelModal.vue'
 import Pagination from '@/components/Pagination.vue'
 import ProductModal from '@/components/ProductModal.vue'
-const productModal = {}
-const delProductModal = {}
 export default {
   components: {
     Pagination,
@@ -88,11 +73,10 @@ export default {
   data () {
     return {
       products: [],
-      isNew: false, // 編輯or新增產品modal標題判斷用
-      temp: {
-        imagesUrl: []
-      },
-      pagination: {}
+      // 傳到內層的id值
+      productId: '',
+      pagination: {},
+      temp: {}
     }
   },
   methods: {
@@ -104,32 +88,9 @@ export default {
         this.pagination = res.data.pagination
       })
     },
-    // 開啟modal
-    openModal (type, product) {
-      if (type === 'new') {
-      // 如果判斷是新增產品 temp內的資料會被清空
-        this.temp = {
-          imagesUrl: []
-        }
-        // modal標題顯示新增產品
-        this.isNew = true
-        // 打開modal
-        productModal.show()
-      } else if (type === 'edit') {
-        // 如果判斷是編輯產品
-        this.temp = JSON.parse(JSON.stringify(product)) // 改成深拷貝避免多圖新增、修改、刪除會傳參考修改到 product.imagesUrl
-        // 讓新增圖片按鈕可以被渲染
-        if (!this.temp.imagesUrl) {
-          this.temp.imagesUrl = []
-        }
-        // modal標題顯示編輯產品
-        this.isNew = false
-        productModal.show()
-      } else if (type === 'delete') {
-        this.temp = { ...product }
-        // 顯示modal
-        delProductModal.show()
-      }
+    openProductModal (id) {
+      this.productId = id
+      this.$refs.productModal.showModal()
     }
   },
   mounted () {

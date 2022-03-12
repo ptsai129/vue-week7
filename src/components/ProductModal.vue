@@ -5,7 +5,7 @@
       <div class="modal-content border-0">
         <div class="modal-header bg-dark text-white">
           <h5 class="modal-title" id="exampleModalLabel">
-            <span>{{ product.title }}</span>
+            <span>{{ product.title }} {{product.id}}</span>
           </h5>
           <button
             type="button"
@@ -59,46 +59,42 @@
 
 <script>
 import Modal from 'bootstrap/js/dist/modal'
-let productModal = {}
 export default {
   data () {
     return {
-      props: ['temp', 'isNew', 'currentPage'],
+      props: ['currentPage', 'id'],
       modal: {},
       product: {},
       // 數量預設一個
       qty: 1
     }
   },
+  watch: {
+    // 監聽id的值是否有變動 若有變動就觸發取得單一產品內容
+    id () {
+      console.log(this.id)
+      this.getProdcutDetails()
+    }
+  },
   methods: {
-    updateProducts () {
-      let updateUrl = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/product`
-      let requestMethod = 'post'
-      // 如果是編輯商品資料 api網址和請求方法會更改
-      if (this.isNew === false) {
-        updateUrl = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/product/${this.temp.id}`
-        requestMethod = 'put'
-      }
-      this.$http.requestMethod(updateUrl, { data: this.temp })
+    showModal () {
+      this.productModal.show()
+    },
+    hideModal () {
+      this.productModal.hide()
+    },
+    getProdcutDetails () {
+      // 觸發 getProdcutDetails 的時， qty 要變成初始值
+      this.qty = 1
+      this.$http.get(`${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/product/${this.id}`)
         .then((res) => {
-          // 顯示已建立產品
-          alert(res.data.message)
-          // 重新取得新的資料並渲染到畫面上
-          this.$emit('update', requestMethod === 'put' ? this.currentPage : 1) // 如果是 put 請求就把 this.currentPage 傳入  getProductsList
-          // 關閉modal
-          productModal.hide()
-        })
-        .catch((err) => {
-          alert(err.data.message)
+          this.product = res.data.product
         })
     }
   },
   mounted () {
-    // 實體化moddl運用ref抓到dom 並儲存到modal物件內
-    // this.modal = new Modal(this.$refs.modal)
-    productModal = new Modal(document.getElementById('productModal'), {
-      keyboard: false // 取消使用esc關閉modal功能
-    })
+    // 實體化modal運用ref抓到dom 並儲存到modal物件內
+    this.productModal = new Modal(this.$refs.modal)
   }
 }
 </script>

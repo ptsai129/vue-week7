@@ -1,4 +1,12 @@
 <template>
+<div
+    id="DelProductModal"
+    ref="modal"
+    class="modal fade"
+    tabindex="-1"
+    aria-labelledby="delProductModalLabel"
+    aria-hidden="true"
+  >
     <div class="modal-dialog">
       <div class="modal-content border-0">
         <div class="modal-header bg-danger text-white">
@@ -31,10 +39,26 @@
         </div>
       </div>
     </div>
+  </div>
 </template>
 
 <script>
+import Modal from 'bootstrap/js/dist/modal'
 export default {
-  props: ['item']
+  props: ['item'],
+  methods: {
+    showModal () {
+      this.delProductModal.show()
+    },
+    hideModal () {
+      this.delProductModal.hide()
+    }
+  },
+  mounted () {
+    this.delProductModal = new Modal(this.$refs.modal, {
+      keyboard: false,
+      backdrop: 'static'
+    })
+  }
 }
 </script>
